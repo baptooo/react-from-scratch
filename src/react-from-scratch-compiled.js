@@ -18,7 +18,7 @@ class Component {
   _render() {
     let vDOM = this.render();
     if (vDOM && vDOM !== this.vDOM) {
-      this.mountNode.innerHTML = vDOM;
+      this.mountNode.innerHTML = this.mountNode.innerHTML ? this.mountNode.innerHTML.replace(this.vDOM, vDOM) : vDOM;
       this.vDOM = vDOM;
     }
   }
@@ -46,8 +46,17 @@ class TodoList extends Component {
   }
 }
 
+class Form extends Component {
+  render() {
+    return `<section>
+        <h1>Main section</h1>
+        ${ render(TodoList, this.mountNode).vDOM }
+      </section>`;
+  }
+}
+
 var render = (compClass, mountNode) => new compClass({}, mountNode);
 
-render(TodoList, document.querySelector('#my-app'));
+render(Form, document.querySelector('#my-app'));
 
 //# sourceMappingURL=react-from-scratch-compiled.js.map
