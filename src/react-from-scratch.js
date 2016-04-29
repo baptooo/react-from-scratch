@@ -1,7 +1,7 @@
 class Component {
   componentWillMount() {}
   componentDidMount() {}
-  constructor(props, mountNode) {
+  constructor(mountNode, props) {
     this.mountNode = mountNode;
     this.props = props;
     this.state = {};
@@ -12,7 +12,7 @@ class Component {
   setState(state) {
     if(state !== this.state) {
       Object.assign(this.state, state);
-      this._render();
+      if(this.vDOM) this._render();
     }
   }
   _render() {
@@ -27,7 +27,7 @@ class Component {
 
 class TodoList extends Component {
   componentWillMount() {
-    this.setState({ items: [0,1,2,3,4,5], elapsedTime: 0 });
+    this.setState({ elapsedTime: 0 });
   }
   componentDidMount() {
     setInterval(() => this.setState({ elapsedTime: this.state.elapsedTime + 1 }), 1e3);
@@ -39,7 +39,7 @@ class TodoList extends Component {
     return (
       `<div>
         <h3>Todolist</h3>
-        <ul>${this.state.items.map(getListItem).join('')}</ul>
+        <ul>${this.props.items.map(getListItem).join('')}</ul>
         <p>${this.state.elapsedTime} second${this.state.elapsedTime > 1 ? 's' : ''} elapsed</p>
       </div>`
     );
@@ -47,16 +47,19 @@ class TodoList extends Component {
 }
 
 class Form extends Component {
+  componentWillMount() {
+    this.setState({ items: [0,1,2,3,4,5] });
+  }
   render() {
     return (
       `<section>
         <h1>Main section</h1>
-        ${render(TodoList, this.mountNode).vDOM}
+        ${render(TodoList, this.mountNode, { items: this.state.items }).vDOM}
       </section>`
     );
   }
 }
 
-var render = (compClass, mountNode) => new compClass({}, mountNode);
+var render = (compClass, mountNode, props) => new compClass(mountNode, props);
 
 render(Form, document.querySelector('#my-app'));
