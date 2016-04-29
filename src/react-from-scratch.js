@@ -5,6 +5,7 @@ class Component {
     this.mountNode = mountNode;
     this.props = props;
     this.state = {};
+    this.todoNest = null;
     this.componentWillMount();
     this._render();
     this.componentDidMount();
@@ -18,8 +19,17 @@ class Component {
   _render() {
     let vDOM = this.render();
     if(vDOM && vDOM !== this.vDOM) {
-      this.mountNode.innerHTML = this.mountNode.innerHTML ? this.mountNode.innerHTML.replace(this.vDOM, vDOM) : vDOM;
+      if(this.mountNode) {
+        this.mountNode.innerHTML = this.mountNode.innerHTML ? this.mountNode.innerHTML.replace(this.vDOM, vDOM) : vDOM;
+      }
       this.vDOM = vDOM;
+    }
+  }
+  nest(compClass, props) {
+    if(!this.todoNest) {
+      this.todoNest = new compClass(null, props);
+      setTimeout(() => this.todoNest.mountNode = document.querySelector('todolist'), 1);
+      return `<TodoList>${this.todoNest.vDOM}</TodoList>`;
     }
   }
   render() { return null; }
@@ -54,7 +64,7 @@ class Form extends Component {
     return (
       `<section>
         <h1>Main section</h1>
-        ${render(TodoList, this.mountNode, { items: this.state.items }).vDOM}
+        ${this.nest(TodoList, { items: this.state.items })}
       </section>`
     );
   }
